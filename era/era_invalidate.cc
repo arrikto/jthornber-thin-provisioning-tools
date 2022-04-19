@@ -4,7 +4,9 @@
 #include <iostream>
 
 #include "version.h"
+#include "base/error_state.h"
 #include "base/indented_stream.h"
+#include "base/nested_output.h"
 #include "era/commands.h"
 #include "era/era_array.h"
 #include "era/writeset_tree.h"
@@ -21,6 +23,71 @@ using namespace std;
 //----------------------------------------------------------------
 
 namespace {
+	// reporter_base and writeset_tree_reporter are duplicate code from era_check.cc
+        class reporter_base {
+        public:
+                reporter_base(nested_output &o)
+                : out_(o),
+                  err_(NO_ERROR) {
+                }
+
+                virtual ~reporter_base() {}
+
+                nested_output &out() {
+                        return out_;
+                }
+
+                nested_output::nest push() {
+                        return out_.push();
+                }
+
+                base::error_state get_error() const {
+                        return err_;
+                }
+
+                void mplus_error(error_state err) {
+                        err_ = combine_errors(err_, err);
+                }
+
+        private:
+                nested_output &out_;
+                error_state err_;
+        };
+
+        class writeset_tree_reporter : public writeset_tree_detail::damage_visitor, reporter_base {
+        public:
+                writeset_tree_reporter(nested_output &o)
+                : reporter_base(o) {
+                }
+
+                void visit(writeset_tree_detail::missing_eras const &d) {
+                        out() << "missing eras from writeset tree" << end_message();
+                        {
+                                nested_output::nest _ = push();
+                                out() << d.get_desc() << end_message();
+                                out() << "Effected eras: [" << d.eras_.begin_.get()
+                                      << ", " << d.eras_.end_.get() << ")" << end_message();
+                        }
+
+                        mplus_error(FATAL);
+                }
+
+                void visit(writeset_tree_detail::damaged_writeset const &d) {
+                        out() << "damaged writeset" << end_message();
+                        {
+                                nested_output::nest _ = push();
+                                out() << d.get_desc() << end_message();
+                                out() << "Era: " << d.era_ << end_message();
+                                out() << "Missing bits: [" << d.missing_bits_.begin_.get()
+                                      << ", " << d.missing_bits_.end_.get() << ")" << end_message();
+                        }
+
+                        mplus_error(FATAL);
+                }
+
+                using reporter_base::get_error;
+        };
+
 	struct flags {
 		flags()
 			: metadata_snapshot_(false) {
@@ -82,8 +149,10 @@ namespace {
 	};
 
 	void walk_writesets(metadata const &md, uint32_t threshold, set<uint32_t> &result) {
+		nested_output out(cerr, 2);
 		writesets_marked_since v(threshold, result);
-		fatal_writeset_tree_damage dv;
+		//fatal_writeset_tree_damage dv;
+		writeset_tree_reporter dv(out);
 
 		walk_writeset_tree(md.tm_, *md.writeset_tree_, v, dv);
 	}
