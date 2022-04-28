@@ -4,6 +4,9 @@
 #include "persistent-data/data-structures/btree.h"
 #include "persistent-data/run.h"
 
+#include <iostream>
+using namespace std;
+
 //----------------------------------------------------------------
 
 namespace persistent_data {
@@ -431,6 +434,7 @@ namespace persistent_data {
 
 			void issue_damage(btree_path const &path, run64 const &r) {
 				damage d(r, build_damage_desc());
+				cerr << "Damage: " << d << "\n";
 				clear_damage_desc();
 				damage_visitor_.visit(path, d);
 			}

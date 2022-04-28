@@ -2,6 +2,7 @@
 #include "persistent-data/data-structures/btree_damage_visitor.h"
 #include "persistent-data/data-structures/bitset.h"
 
+#include <iostream>
 using namespace era;
 using namespace writeset_tree_detail;
 using namespace persistent_data;
@@ -65,6 +66,7 @@ namespace {
 		}
 
 		void visit(bitset_detail::missing_bits const &d) {
+			cerr << "Missing bits: " << d.keys_ << "\n";
 			dv_.visit(writeset_tree_detail::damaged_writeset("missing bits", era_, d.keys_));
 		}
 

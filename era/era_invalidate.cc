@@ -65,11 +65,13 @@ namespace {
                         {
                                 nested_output::nest _ = push();
                                 out() << d.get_desc() << end_message();
-                                out() << "Effected eras: [" << d.eras_.begin_.get()
-                                      << ", " << d.eras_.end_.get() << ")" << end_message();
+                                out() << "Effected eras: " << d.eras_ << end_message();
+                                //out() << "Effected eras: [" << d.eras_.begin_.get()
+                                //      << ", " << d.eras_.end_.get() << ")" << end_message();
                         }
 
                         mplus_error(FATAL);
+			throw std::runtime_error("metadata contains errors (run era_check for details).");
                 }
 
                 void visit(writeset_tree_detail::damaged_writeset const &d) {
@@ -78,11 +80,13 @@ namespace {
                                 nested_output::nest _ = push();
                                 out() << d.get_desc() << end_message();
                                 out() << "Era: " << d.era_ << end_message();
-                                out() << "Missing bits: [" << d.missing_bits_.begin_.get()
-                                      << ", " << d.missing_bits_.end_.get() << ")" << end_message();
+				out() << "Missing bits: " << d.missing_bits_ << end_message();
+                                //out() << "Missing bits: [" << d.missing_bits_.begin_.get()
+                                //      << ", " << d.missing_bits_.end_.get() << ")" << end_message();
                         }
 
                         mplus_error(FATAL);
+			throw std::runtime_error("metadata contains errors (run era_check for details).");
                 }
 
                 using reporter_base::get_error;

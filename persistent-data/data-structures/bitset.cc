@@ -2,6 +2,7 @@
 #include "persistent-data/data-structures/bitset.h"
 #include "persistent-data/math_utils.h"
 
+#include <iostream>
 using namespace persistent_data;
 using namespace persistent_data::bitset_detail;
 using namespace std;
@@ -113,6 +114,7 @@ namespace persistent_data {
 				}
 
 				void visit(array_detail::damage const &d) {
+					cerr << "Missing blocks: " << d << "\n";
 					run<uint32_t> bits(lifted_mult64(d.lost_keys_.begin_),
 							   lifted_mult64(d.lost_keys_.end_));
 					v_.visit(bits);

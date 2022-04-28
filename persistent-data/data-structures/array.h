@@ -24,6 +24,8 @@
 #include "persistent-data/data-structures/btree_counter.h"
 #include "persistent-data/data-structures/btree_damage_visitor.h"
 #include "persistent-data/data-structures/array_block.h"
+#include <iostream>
+using namespace std;
 
 //----------------------------------------------------------------
 
@@ -281,6 +283,7 @@ namespace persistent_data {
 			// check that all blocks were seen
 			unsigned h = bvisitor.get_highest_seen();
 			if (h != nr_entries_ - 1) {
+				cerr << "Missing blocks: Seen " << (h + 1) << " Expected " << nr_entries_ << "\n";
 				array_detail::damage d(run<unsigned>(h + 1, nr_entries_), "missing blocks");
 				damage_visitor.visit(d);
 			}

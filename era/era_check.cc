@@ -105,8 +105,9 @@ namespace {
 			{
 				nested_output::nest _ = push();
 				out() << d.get_desc() << end_message();
-				out() << "Effected eras: [" << d.eras_.begin_.get()
-				      << ", " << d.eras_.end_.get() << ")" << end_message();
+				out() << "Effected eras: " << d.eras_ << end_message();
+				//out() << "Effected eras: [" << d.eras_.begin_.get()
+				//      << ", " << d.eras_.end_.get() << ")" << end_message();
 			}
 
 			mplus_error(FATAL);
@@ -118,8 +119,9 @@ namespace {
 				nested_output::nest _ = push();
 				out() << d.get_desc() << end_message();
 				out() << "Era: " << d.era_ << end_message();
-				out() << "Missing bits: [" << d.missing_bits_.begin_.get()
-				      << ", " << d.missing_bits_.end_.get() << ")" << end_message();
+				out() << "Missing bits: " << d.missing_bits_ << end_message();
+				//out() << "Missing bits: [" << d.missing_bits_.begin_.get()
+				//      << ", " << d.missing_bits_.end_.get() << ")" << end_message();
 			}
 
 			mplus_error(FATAL);
